@@ -1,16 +1,18 @@
 (require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
-(setq package-archives '(("melpa-stable" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa-stable/")
-			 ("gnu-elpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")))
 
 ;; cl - Common Lisp Extension
 (require 'cl)
 
 ;; Add Packages
 (defvar my/packages '(
+		      ivy
+		      swiper
+		      ivy-bibtex
 		      ;; --- Auto-completion ---
 		      company
-		      company-lsp
 		      ;; --- Rust mode ---
 		      rust-mode
 		      ;; --- Themes ---
@@ -47,11 +49,27 @@
     (when (not (package-installed-p pkg))
       (package-install pkg))))
 
+;; org-mode
+(require 'ol-bibtex)
+(require 'oc-biblatex)
+
+;; ivy
+(ivy-mode 1)
+(setq ivy-use-virtual-buffers t)
+(setq ivy-count-format "(%d/%d) ")
+(require 'ivy-bibtex)
+(setq bibtex-completion-bibliography
+      '("~/Documents/zotero_export/我的文库.bib"))
+(setq bibtex-completion-pdf-field "file")
+(setq bibtex-completion-notes-path "~/Documents/myOrg/paper_notes")
+(setq bibtex-completion-format-citation-functions
+      '((org-mode . bibtex-completion-format-citation-org-cite)
+	(latex-mode . bibtex-completion-format-citation-cite)
+	(markdown-mode . bibtex-completion-format-citation-pandoc-citeproc)
+	(default . bibtex-completion-format-citation-default)))
+  
+
 ;; 对所有buffer开启company
-(add-hook 'after-init-hook 'global-company-mode)
-;; 设置company-lsp为company后端
-(require 'company-lsp)
-(push 'company-lsp company-backends)
 (setq company-idle-delay 0.2) ; set the completion menu pop-up delay
 (setq company-minimum-prefix-length 1) ; pop up a completion menu by tapping a character
 
